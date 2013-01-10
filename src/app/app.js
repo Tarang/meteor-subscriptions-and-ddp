@@ -13,16 +13,6 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-  Meteor.startup(function () {
-    Posts.remove({});
-
-    for (var i = 0; i < 3; i += 1) {
-      Posts.insert({
-        message: "Message " + i
-      });
-    }
-  });
-
   Meteor.publish("posts", function () {
     var self = this;
     var id = Meteor.uuid();
