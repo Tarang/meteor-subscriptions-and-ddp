@@ -1,9 +1,9 @@
 if (Meteor.isClient) {
-  Posts = new Meteor.Collection("posts");
+  Items = new Meteor.Collection("items");
 
-  Template.posts.helpers({
-    posts: function () {
-      return Posts.find();
+  Template.items.helpers({
+    items: function () {
+      return Items.find();
     }
   });
 
