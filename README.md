@@ -24,7 +24,7 @@ To start the DDP client and subscribe to `posts`
 > node client.js
 ```
 
-If you don't already have MRT installed:
+If you don't already have `mrt` installed:
 
 ```bash
 > npm install -g meteorite
