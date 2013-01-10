@@ -22,5 +22,10 @@ if (Meteor.isServer) {
 
     self.complete();
     self.flush();
+
+    Meteor.setTimeout(function () {
+      self.unset("posts", id, ["message"]);
+      self.flush();
+    }, 2000);
   });
 }
