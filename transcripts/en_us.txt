@@ -1,0 +1,59 @@
+In this screencast we'll get some intuition about how Meteor's DDP protocol
+works with subscriptions and collections. The DDP protocol is changing, but our
+goal for now is just to see how the parts fit together. So even when the
+protocol changes, these concepts should still be helpful.
+
+Let's visualize the parts of the Meteor system we'll be looking at. 
+
+First I have the client or the browser. In the browser we can create
+collections which are driven by Minimongo. We can also subscribe to messages
+broadcast from the server.
+
+Then I have the Meteor server. In the server we can create collections which
+use MongoDB. And we can publish messages to connected clients.
+
+The client and the server pass messages back and forth using the DDP protocol.
+The messages are simple JSON objects.
+
+We'll start off with a simple subscription to a MongoDB collection called Posts
+with a user interface that just shows a message for each post. 
+
+Let's take a quick tour through the code and then we'll take a look at the DDP
+messages that are being sent by the server.
+
+On the left is the app.html file. In the body I'm rendering the posts
+template.  Inside the template I iterate over all the posts, creating a list
+item and displaying the message for each post.
+
+On the right is the app.js file. First I create a new Meteor.Collection called
+posts. This code will run on both the client and the server. But on the client,
+the collection will be driven by Minimongo which is a light, in-memory version
+of MongoDB that runs completely in the browser.
+
+Inside the client I've defined the posts helper on the posts template which
+reactively returns the results of the Minimongo Posts collection. Then, I
+create a subscription by calling Meteor.subscribe and passing the name of the
+subscription as the first parameter, an array of parameters as the second, and finally a callback that will get called when the subscription is
+complete. This happens when all of the initial documents have been sent.
+
+On the server, when it starts, I'll load up my Mongo Posts collection with a
+few dummy documents. Then I'll create a publication by calling Meteor.publish
+with the name of the publication as the first parameter, and a callback
+function as the second. The callback function will get called any
+time a new client subscribes. In this example, the callback returns
+Posts.find(). This will automatically publish all existing documents, as well
+as send messages for added, changed or removed documents.
+
+Let's try to get a better sense of what's going on by inspecting the DDP
+messages being sent when we subscribe to posts. To do that we'll create a
+simple DDP client that prints out the messages to the console.
+
+I've created a fork of Tom Coleman's node-ddp-client, and added the ability to inspect DDP messages as they come off the wire.
+
+Since I haven't published my fork to npm, I'm going to first add it as a submodule to my git project. I'll type 'git submodule add' followed by location of the repository and then the destination, in this case inside my ddp_client folder. I get a message saying it already exists, because I've already added the submodule, but if you're doing it for the first time, you won't get this error. Next, I'm going to grab the code for the submodule by typing git submodule update with the '--init' switch. Once again I get an error saying I've already done this.But if you're initializing the submodule for the first time, you won't get this error.
+
+Finally, I'll change into my ddp_client folder and type 'npm link' followed by the path to the ddp-client module. That will install the module and all of its dependencies in a central folder, and then symlink to it from the node_modules directory. Great, now I can require the ddp module in my code. Now let's create our client.js file and pop into VIM.
+
+First, I'll require the 'ddp' module. Next, I'll create a new DDPClient, passing an options object with a host of localhost and a port of 3000. Then, I'll add a callback using the onMessage method I created in my fork to print ddp messages to the console as they come off the wire. Finally, I'll call the connect method, and once we're connected I'll call the subscribe method with the name of the subscription as the first parameter, an array of parameters as the second, and callback function that will get called when the subscription is marked as complete. Let's try it out.
+
+In the browser things work as expected. Below, we'll start our client and take a look at the mssages. You can see that for each post in the Posts collection, we get a ddp message of type "data" with a "set" property. Then, we get a final message telling us we've received all the initial posts and our subscription complete callback is called.
