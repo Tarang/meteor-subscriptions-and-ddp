@@ -17,14 +17,14 @@ if (Meteor.isServer) {
     var self = this;
     var id = Meteor.uuid();
 
-    self.set("posts", id, { message: "Hello from publisher!" });
-    self.set("posts", Meteor.uuid(), { message: "Last message!" });
+    self.set("items", id, { message: "Hello from publisher!" });
+    self.set("items", Meteor.uuid(), { message: "Last message!" });
 
     self.complete();
     self.flush();
 
     Meteor.setTimeout(function () {
-      self.unset("posts", id, ["message"]);
+      self.unset("items", id, ["message"]);
       self.flush();
     }, 2000);
   });
