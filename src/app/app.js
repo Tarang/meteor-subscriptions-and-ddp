@@ -20,6 +20,7 @@ if (Meteor.isServer) {
     self.set("posts", id, { message: "Hello from publisher!" });
     self.set("posts", Meteor.uuid(), { message: "Last message!" });
 
+    self.complete();
     self.flush();
   });
 }
