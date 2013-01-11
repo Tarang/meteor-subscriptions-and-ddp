@@ -21,9 +21,9 @@ with a user interface that just shows a message for each post.
 Let's take a quick tour through the code and then we'll take a look at the DDP
 messages that are being sent by the server.
 
-On the left is the app.html file. In the body I'm rendering the posts
-template.  Inside the template I iterate over all the posts, creating a list
-item and displaying the message for each post.
+On the left is the app.html file. In the body I'm rendering the posts template.
+Inside the template I iterate over all the posts, creating a list item and
+displaying the message for each post.
 
 On the right is the app.js file. First I create a new Meteor.Collection called
 posts. This code will run on both the client and the server. But on the client,
@@ -85,8 +85,37 @@ document with a given id and a for a collection named "posts". Then we get a
 final message telling us we've received all the initial posts. In other words,
 our subscription is complete and our subscription callback is called.
 
-Okay, let's try creating our own publisher not using a Mongo collection. Over the app.js file the first thing I'll do is move the Posts collection into the client. This means it will only exist locally on the browser, not in our server side Mongo store. Next, we won't need the server startup code anymore since we've removed the server side collection. Now let's send some custom messages in our publisher function.
+Okay, let's try creating our own publisher that doesn't user a server side
+Mongo collection.
 
-First, by convention I'll store 'this' in a variable called 'self.' Then I'll create a new unique identifier that we'll use a little later. Next, I'll call the set method of self to send a "set" message. The first parameter will be the name of the collection we wish to perform a set operation on. The next parameter is the id of the document. The last parameter is an object containing the fields we want to set. So far, we've only be queuing up the messages. We tell Meteor to send them down to the client by calling the 'flush' method.
+Over the app.js file the first thing I'll do is move the Posts collection into
+the client. This means it will only exist locally on the browser, not in our
+server side Mongo store. Next, we won't need the server startup code anymore
+since we've removed the server side collection. Now let's send some custom
+messages in our publisher function.
 
-Let's take a look. We can see our messages appear in the browser as expected. If we start our ddp client we can see the two messages we set in the publisher function. But wait, we're missing something. Notice in the browser our subscription complete callback dind't print anythign to the console? And in our ddp client we don't see the callback message printed either. Although it's not preventing us from receiving the messages, let's update our code to send the subscription complete message to the client.
+First, by convention I'll store 'this' in a variable called 'self.' Then I'll
+create a new unique identifier that we'll use a little later. Next, I'll call
+the set method of self to send a "set" message. The first parameter will be the
+name of the collection we wish to perform a set operation on. The next
+parameter is the id of the document. The last parameter is an object containing
+the fields we want to set. So far, we've only be queuing up the messages. We
+tell Meteor to send them down to the client by calling the 'flush' method.
+
+Let's take a look. 
+
+We can see our messages appear in the browser as expected.  If we start our ddp
+client we can see the two messages we set in the publisher function. But wait,
+we're missing something. Notice in the browser our subscription complete
+callback dind't print anythign to the console? And in our ddp client we don't
+see the callback message printed either. Although it's not preventing us from
+receiving the messages, let's update our code to send the subscription complete
+message to the client.
+
+In our publish callback all we need to do is call the 'complete' method on
+'self.' This will queue up a complete message that will be sent to the client
+along with the rest of our messages.
+
+Over in the browser we can see the callback prints the message to the console,
+and we can see in our ddp client that the last message is the subscription
+complete message.
