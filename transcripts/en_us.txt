@@ -80,7 +80,13 @@ marked as complete. Let's try it out.
 In the upper right I'm running my Meteor server. In the upper left we see
 things working as expected in the browser. In the bottom terminal let's fire up
 our ddp client. The key thing to notice is that for each post in the Posts
-collection we get a ddp message telling us to "set" a set of fields in a
+collection we get a ddp message telling us to "set" certain fields in a
 document with a given id and a for a collection named "posts". Then we get a
 final message telling us we've received all the initial posts. In other words,
 our subscription is complete and our subscription callback is called.
+
+Okay, let's try creating our own publisher not using a Mongo collection. Over the app.js file the first thing I'll do is move the Posts collection into the client. This means it will only exist locally on the browser, not in our server side Mongo store. Next, we won't need the server startup code anymore since we've removed the server side collection. Now let's send some custom messages in our publisher function.
+
+First, by convention I'll store 'this' in a variable called 'self.' Then I'll create a new unique identifier that we'll use a little later. Next, I'll call the set method of self to send a "set" message. The first parameter will be the name of the collection we wish to perform a set operation on. The next parameter is the id of the document. The last parameter is an object containing the fields we want to set. So far, we've only be queuing up the messages. We tell Meteor to send them down to the client by calling the 'flush' method.
+
+Let's take a look. We can see our messages appear in the browser as expected. If we start our ddp client we can see the two messages we set in the publisher function. But wait, we're missing something. Notice in the browser our subscription complete callback dind't print anythign to the console? And in our ddp client we don't see the callback message printed either. Although it's not preventing us from receiving the messages, let's update our code to send the subscription complete message to the client.
